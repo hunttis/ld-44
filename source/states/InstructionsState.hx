@@ -7,10 +7,9 @@ import flixel.text.FlxText;
 import flixel.util.FlxColor;
 import states.Util;
 
-class MainMenuState extends FlxState {
+class InstructionsState extends FlxState {
 
   private var titleText: FlxText;
-  private var startText: FlxText;
   private var bloodEmitter: FlxEmitter;
 
   override public function create(): Void {
@@ -24,13 +23,13 @@ class MainMenuState extends FlxState {
     super.update(elapsed);
     Util.checkQuitKey();
     if (FlxG.keys.justPressed.SPACE) {
-      FlxG.switchState(new InstructionsState());
+      FlxG.switchState(new PlayState());
     }
     bloodEmitter.start(true, 0.1, 1);
   }
 
   private function createTitle(): Void {
-    titleText = new FlxText(FlxG.width / 2, 50, "    Don't wake a\nsleeping vampire", 48);
+    titleText = new FlxText(FlxG.width / 2, 50, "Instructions", 32);
     titleText.x -= titleText.width / 2;
     titleText.setBorderStyle(FlxTextBorderStyle.OUTLINE, FlxColor.GRAY, 2, 1);
     bloodEmitter = createBloodEmitter();
@@ -39,12 +38,18 @@ class MainMenuState extends FlxState {
   }
 
   private function createInstructions(): Void {
-    var soundInstructions = new FlxText(FlxG.width / 2, 400, "Zero disables sounds, + and - control volume", 16);
-    soundInstructions.x -= soundInstructions.width / 2;
+    var soundInstructions = new FlxText(100, 150, "ARROW KEYS: control character", 16);
     add(soundInstructions);
-    startText = new FlxText(FlxG.width / 2, 300, "Press space to start", 16);
-    startText.x -= startText.width / 2;
-    add(startText);
+    var meldText = new FlxText(100, 200, "SPACE: meld with shadows and step out of them", 16);
+    add(meldText);
+    var stunText = new FlxText(100, 250, "DOWN: While jumping to dive down and stun an enemy.", 16);
+    add(stunText);
+    var meldText2 = new FlxText(100, 300, "Kill all enemies by ambushing them with meld shadows.\nMelding in or out kills them", 16);
+    add(meldText2);
+    var drainText = new FlxText(100, 360, "Beware! Using powers (meld and stun) drains your life!", 16);
+    add(drainText);
+    var restartText = new FlxText(100, 450, "Pressing R restarts a level. Pressing 9 skips a level. You can also use a gamepad to play.", 12);
+    add(restartText);
   }
 
   private function createBloodEmitter() {

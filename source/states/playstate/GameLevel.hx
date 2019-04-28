@@ -6,7 +6,6 @@ import flixel.tile.FlxTilemap;
 import flixel.ui.FlxBar;
 import flixel.FlxG;
 import flixel.group.FlxGroup;
-import flixel.text.FlxText;
 import states.playstate.LevelMap;
 import states.playstate.gameobjects.Arrow;
 
@@ -37,7 +36,6 @@ class GameLevel extends FlxGroup {
   }
 
   private function checkControls(elapsed: Float): Void {
-    checkMouse(elapsed);
     checkCollisions(elapsed);
   }
 
@@ -53,13 +51,6 @@ class GameLevel extends FlxGroup {
     }
   }
 
-  private function checkMouse(elapsed: Float): Void {
-    #if (!mobile)
-      // Mouse not on mobile!
-      
-    #end
-  }
-
   private function arrowHitsGround(layer: FlxTilemap, arrow: Arrow) {
     arrow.hitGround();
   }
@@ -70,9 +61,9 @@ class GameLevel extends FlxGroup {
     }
     if (player.isCorporeal()) {
       arrow.destroy();
-      player.hurt(10);
+      player.hurt(20);
     } else {
-      player.hurt(0.05);
+      player.hurt(0.10);
     }
   }
 
@@ -137,7 +128,7 @@ class GameLevel extends FlxGroup {
 
   public function isGameOver(): Bool {
     #if debug // This part (cheat) of the code is only active if the -debug parameter is present
-      if (FlxG.keys.justPressed.ZERO) {
+      if (FlxG.keys.justPressed.EIGHT) {
         return true;
       }
     #end

@@ -12,7 +12,9 @@ class Util {
 
   public static function startMusic(): Void {
     if (FlxG.sound.music == null) {
-      // FlxG.sound.playMusic('assets/ld44-theme.mp3', 1, true);
+      #if !debug
+        FlxG.sound.playMusic('assets/ld44-theme.mp3', 1, true);
+      #end
     }
   }
 }

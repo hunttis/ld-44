@@ -7,10 +7,10 @@ import flixel.text.FlxText;
 import flixel.util.FlxColor;
 import states.Util;
 
-class MainMenuState extends FlxState {
+class GameCompleteState extends FlxState {
 
   private var titleText: FlxText;
-  private var startText: FlxText;
+  private var mainMenuText: FlxText;
   private var bloodEmitter: FlxEmitter;
 
   override public function create(): Void {
@@ -24,13 +24,13 @@ class MainMenuState extends FlxState {
     super.update(elapsed);
     Util.checkQuitKey();
     if (FlxG.keys.justPressed.SPACE) {
-      FlxG.switchState(new InstructionsState());
+      FlxG.switchState(new MainMenuState());
     }
     bloodEmitter.start(true, 0.1, 1);
   }
 
   private function createTitle(): Void {
-    titleText = new FlxText(FlxG.width / 2, 50, "    Don't wake a\nsleeping vampire", 48);
+    titleText = new FlxText(FlxG.width / 2, 50, "Congrats!", 64);
     titleText.x -= titleText.width / 2;
     titleText.setBorderStyle(FlxTextBorderStyle.OUTLINE, FlxColor.GRAY, 2, 1);
     bloodEmitter = createBloodEmitter();
@@ -39,12 +39,12 @@ class MainMenuState extends FlxState {
   }
 
   private function createInstructions(): Void {
-    var soundInstructions = new FlxText(FlxG.width / 2, 400, "Zero disables sounds, + and - control volume", 16);
-    soundInstructions.x -= soundInstructions.width / 2;
-    add(soundInstructions);
-    startText = new FlxText(FlxG.width / 2, 300, "Press space to start", 16);
-    startText.x -= startText.width / 2;
-    add(startText);
+    var endText = new FlxText(FlxG.width / 2, 300, "You've ended the druid reign!", 16);
+    endText.x -= endText.width / 2;
+    add(endText);
+    mainMenuText = new FlxText(FlxG.width / 2, 400, "Press space to go back to the main menu!", 16);
+    mainMenuText.x -= mainMenuText.width / 2;
+    add(mainMenuText);
   }
 
   private function createBloodEmitter() {

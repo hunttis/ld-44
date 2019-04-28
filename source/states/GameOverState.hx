@@ -1,5 +1,6 @@
 package states;
 
+import flixel.effects.particles.FlxEmitter;
 import flixel.system.FlxSound;
 import flixel.FlxState;
 import flixel.FlxG;
@@ -12,6 +13,7 @@ class GameOverState extends FlxState {
   private var continueText: FlxText;
   private var gameoverSound: FlxSound;
   private var soundPlayed: Bool = false;
+  private var bloodEmitter: FlxEmitter;
 
   override public function create(): Void {
     super.create();
@@ -36,6 +38,8 @@ class GameOverState extends FlxState {
     gameOverText = new FlxText(FlxG.width / 2, 100, "Game over!", 64);
     gameOverText.x -= gameOverText.width / 2;
     gameOverText.setBorderStyle(FlxTextBorderStyle.OUTLINE, FlxColor.RED, 2, 1);
+    bloodEmitter = createBloodEmitter();
+    add(bloodEmitter);
     add(gameOverText);
   }
 
@@ -44,5 +48,19 @@ class GameOverState extends FlxState {
     continueText.x -= continueText.width / 2;
     add(continueText);
   }
+
+    private function createBloodEmitter() {
+    var emitter = new FlxEmitter(0, 0, 100);
+    emitter.loadParticles('assets/blood.png', 100);
+    emitter.setSize(gameOverText.width, gameOverText.height);
+    emitter.lifespan.set(1, 2);
+    emitter.alpha.set(0.75, 1, 0, 0);
+    emitter.scale.set(0.5, 0.5, 1, 1, 1, 1, 1.5, 1.5);
+    emitter.launchMode = FlxEmitterMode.SQUARE;
+    emitter.velocity.set(0, 100, 0, 200, 0, 100, 0, 200);
+    emitter.setPosition(gameOverText.x, gameOverText.y);
+    return emitter;
+  }
+
 
 }

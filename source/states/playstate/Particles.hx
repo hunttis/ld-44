@@ -3,12 +3,10 @@ package states.playstate;
 import flixel.FlxG;
 import flixel.FlxObject;
 import flixel.util.FlxColor;
-import flixel.effects.particles.FlxParticle;
 import flixel.math.FlxPoint;
 import flixel.util.FlxSignal.FlxTypedSignal;
 import flixel.effects.particles.FlxEmitter;
 import flixel.group.FlxGroup;
-import states.playstate.particles.Smoke;
 
 class Particles extends FlxGroup {
 

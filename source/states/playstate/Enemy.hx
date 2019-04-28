@@ -2,11 +2,9 @@ package states.playstate;
 
 import flixel.FlxG;
 import flixel.system.FlxSound;
-import flixel.ui.FlxBar;
 import flixel.math.FlxPoint;
 import flixel.tile.FlxTilemap;
 import flixel.FlxObject;
-import flixel.util.FlxColor;
 import flixel.FlxSprite;
 import states.playstate.gameobjects.Arrow;
 
@@ -44,7 +42,6 @@ class Enemy extends FlxSprite {
   var shootCooldown: Float = 0.2;
   var maxShootCooldown: Float = 0.5;
   var lookingWalkMaxCooldown: Float = 0.5;
-  var beingDevoured: Bool = false;
 
   var player: Player;
   var level: FlxTilemap;
@@ -309,9 +306,10 @@ class Enemy extends FlxSprite {
   }
 
   public function devour(): Bool {
-    if (!beingDevoured) {
-      beingDevoured = true;
+    if (mindState != BeingDevoured) {
       mindState = BeingDevoured;
+      scale.x = 1;
+      scale.y = 1;
       stateCooldown = 1;
       parent.enemies.forEachAlive((enemy: Enemy) -> {
         enemy.checkIfSeesDevouring();
@@ -328,7 +326,7 @@ class Enemy extends FlxSprite {
   }
 
   public function stun(): Bool {
-    if (mindState != Stunned) {
+    if (mindState != Stunned && mindState != BeingDevoured) {
       mindState = Stunned;
       stateCooldown = 2;
       return true;

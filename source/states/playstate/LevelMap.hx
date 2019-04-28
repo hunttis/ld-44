@@ -40,24 +40,20 @@ class LevelMap extends FlxGroup {
           lightLayer.alpha = 0.1;
           lightLayer.useScaleHack = false;
         } else if (tileLayer.name == "foreground") {
-          // trace("Creating foreground!");
           foregroundLayer = new FlxTilemap();
           foregroundLayer.loadMapFromCSV(tileLayer.csvData, "assets/foregroundtiles.png", 16, 16, null, 1, 1, 1);
           foregroundLayer.useScaleHack = false;
         } else if (tileLayer.name == "background") {
-          // trace("Creating background!");
           backgroundLayer = new FlxTilemap();
           backgroundLayer.loadMapFromCSV(tileLayer.csvData, "assets/backgroundtiles.png", 16, 16, null, 65, 65, 65);
           backgroundLayer.useScaleHack = false;
         } else if (tileLayer.name == "parallax") {
-          // trace("Creating background!");
           parallaxLayer = new FlxTilemap();
           parallaxLayer.loadMapFromCSV(tileLayer.csvData, "assets/backgroundtiles.png", 16, 16, null, 65, 65, 65);
           parallaxLayer.useScaleHack = false;
           parallaxLayer.color = FlxColor.BLACK;
           parallaxLayer.x = -4;
         } else if (tileLayer.name == "patrollimits") {
-          trace("Creating Patrol limits!");
           patrollimitsLayer = new FlxTilemap();
           patrollimitsLayer.loadMapFromCSV(tileLayer.csvData, "assets/entities.png", 16, 16, null, 129, 129, 129);
           patrollimitsLayer.useScaleHack = false;

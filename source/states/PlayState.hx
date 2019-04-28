@@ -4,6 +4,7 @@ import flixel.FlxG;
 import flixel.FlxState;
 import states.playstate.GameLevel;
 import states.Util;
+import states.GameCompleteState;
 
 class PlayState extends FlxState {
 
@@ -25,8 +26,15 @@ class PlayState extends FlxState {
   override public function update(elapsed: Float): Void {
     super.update(elapsed);
     Util.checkQuitKey();
+    checkForLevelRestart();
     checkForGameOver();
     checkForLevelEnd();
+  }
+
+  private function checkForLevelRestart(): Void {
+    if (FlxG.keys.pressed.R) {
+      FlxG.switchState(new PlayState(currentLevelNumber));
+    }
   }
 
   private function loadLevel(levelNumber: Int): GameLevel {
@@ -43,7 +51,11 @@ class PlayState extends FlxState {
     // Remember to account for the fact that there might not be a "next level"!
     if (currentLevel.isLevelComplete()) {
       currentLevelNumber++;
-      FlxG.switchState(new PlayState(currentLevelNumber));
+      if (currentLevelNumber == 5) {
+        FlxG.switchState(new GameCompleteState());
+      } else {
+        FlxG.switchState(new PlayState(currentLevelNumber));
+      }
     }
   }
 

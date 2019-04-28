@@ -68,6 +68,14 @@ class Player extends FlxSprite {
       parent.particles.glitter(this.x, this.y);
     }
 
+    if (this.x < 8) {
+      this.x = 8;
+      this.velocity.x = 0;
+    } else if (this.x > 1280 - 16) {
+      this.x = 1280 - 18;
+      this.velocity.x = 0;
+    }
+
     if (isTouching(FlxObject.FLOOR) && stunPowerActive > 0) {
       parent.particles.smokeBlast(this.x, this.y + 24);
       stunPowerActive = 0;
@@ -99,7 +107,7 @@ class Player extends FlxSprite {
     }
 
     if (shadowPowerActive) {
-      health -= elapsed;
+      hurt(elapsed * 2);
     }
 
     super.update(elapsed);
@@ -173,6 +181,7 @@ class Player extends FlxSprite {
     if (!isTouching(FlxObject.FLOOR)) {
       velocity.y = maxVelocity.y;
       stunPowerActive = 1;
+      hurt(5);
     }
   }
 
@@ -210,12 +219,10 @@ class Player extends FlxSprite {
   }
 
   private function usePowerOnEnemy(player, enemy: Enemy) {
-    if (shadowPowerActive || (!shadowPowerActive && enemy.isStunned())) {
-      if (enemy.devour()) {
-        biteSound.play(true);
-        addHealth(10);
-        parent.particles.sprayBlood(enemy.x, enemy.y);
-      }
+    if (enemy.devour()) {
+      biteSound.play(true);
+      addHealth(10);
+      parent.particles.sprayBlood(enemy.x, enemy.y);
     }
   }
 
