@@ -9,4 +9,10 @@ class Util {
       System.exit(0);
     }
   }
+
+  public static function startMusic(): Void {
+    if (FlxG.sound.music == null) {
+      FlxG.sound.playMusic('assets/ld44-theme.mp3', 1, true);
+    }
+  }
 }

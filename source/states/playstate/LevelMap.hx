@@ -55,6 +55,7 @@ class LevelMap extends FlxGroup {
           parallaxLayer.loadMapFromCSV(tileLayer.csvData, "assets/backgroundtiles.png", 16, 16, null, 65, 65, 65);
           parallaxLayer.useScaleHack = false;
           parallaxLayer.color = FlxColor.BLACK;
+          parallaxLayer.x = -4;
         } else if (tileLayer.name == "patrollimits") {
           trace("Creating Patrol limits!");
           patrollimitsLayer = new FlxTilemap();

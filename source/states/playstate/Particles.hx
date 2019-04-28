@@ -17,6 +17,8 @@ class Particles extends FlxGroup {
   var bloodEmitter: FlxEmitter;
   var alertEmitter: FlxEmitter;
   var aggroEmitter: FlxEmitter;
+  var sparkEmitter: FlxEmitter;
+  var glitterEmitter: FlxEmitter;
   var listener: FlxTypedSignal<FlxPoint->Void>;
 
   public function new(parent: GameLevel) {
@@ -34,6 +36,12 @@ class Particles extends FlxGroup {
 
     aggroEmitter = createAggroEmitter();
     this.add(aggroEmitter);
+
+    sparkEmitter = createSparkEmitter();
+    this.add(sparkEmitter);
+
+    glitterEmitter = createGlitterEmitter();
+    this.add(glitterEmitter);
   }
 
   override public function update(elapsed: Float) {
@@ -94,6 +102,32 @@ class Particles extends FlxGroup {
     return emitter;
   }
 
+  private function createSparkEmitter() {
+    var emitter = new FlxEmitter(0, 0, 100);
+    emitter.makeParticles(2, 2, FlxColor.CYAN, 100);
+    emitter.setSize(1, 1);
+    emitter.lifespan.set(0, 1);
+    // emitter.alpha.set(0.75, 1, 0, 0);
+    // emitter.scale.set(0.5, 0.5, 1, 1, 1, 1, 1.5, 1.5);
+    emitter.launchMode = FlxEmitterMode.SQUARE;
+    emitter.velocity.set(-10, -10, 10, 10, 0, 0, 0, 0);
+    // emitter.allowCollisions = FlxObject.FLOOR | FlxObject.WALL | FlxObject.CEILING;
+    return emitter;
+  }
+
+  private function createGlitterEmitter() {
+    var emitter = new FlxEmitter(0, 0, 100);
+    emitter.makeParticles(2, 2, FlxColor.WHITE, 100);
+    emitter.setSize(16, 32);
+    emitter.scale.set(0.25, 0.25, 0.5, 0.5, 1, 1, 1.5, 1.5);
+    emitter.angularVelocity.set(60, 60, 60, 60);
+    emitter.lifespan.set(0.25, 0.3);
+    emitter.alpha.set(0.75, 1, 0, 0);
+    emitter.launchMode = FlxEmitterMode.SQUARE;
+    emitter.velocity.set(-10, -10, 10, 10, 0, 0, 0, 0);
+    // emitter.allowCollisions = FlxObject.FLOOR | FlxObject.WALL;
+    return emitter;
+  }
 
   public function smokePuff(xLoc: Float, yLoc: Float) {
     smokeEmitter.setPosition(xLoc, yLoc - 16);
@@ -113,5 +147,15 @@ class Particles extends FlxGroup {
   public function aggro(xLoc: Float, yLoc: Float) {
     aggroEmitter.setPosition(xLoc + 8, yLoc - 8);
     aggroEmitter.start(true, 1, 1);
+  }
+
+  public function spark(xLoc: Float, yLoc: Float) {
+    sparkEmitter.setPosition(xLoc, yLoc);
+    sparkEmitter.start(true, 1, 1);
+  }
+
+  public function glitter(xLoc: Float, yLoc: Float) {
+    glitterEmitter.setPosition(xLoc, yLoc);
+    glitterEmitter.start(true, 0.1 , 1);
   }
 }

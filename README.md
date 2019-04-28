@@ -5,14 +5,16 @@
 
 Must have:
 
-[ ] Player graphics and animation
-[ ] Enemy graphics
-[ ] Player indicator of being in the light
-[ ] Enemy indicator of being alert
-[ ] Enemy indicator of being Aggressive
-[ ] Enemy indicator of "cooling down"
+[x] Player graphics and animation
+[x] Enemy graphics
+[x] Player indicator of being in the light
+[x] Enemy indicator of being alert
+[x] Enemy indicator of being Aggressive
+[x] Enemy indicator of "cooling down"
 [ ] More Levels
-[ ] Music OR Sounds
+[ ] Music
+[ ] Sounds
+[ ] Game instructions
 
 Nice to have:
 [ ] Sounds OR Music

@@ -15,9 +15,9 @@ class Main extends Sprite {
     // FlxG.debugger.drawDebug = true;
 
     if (startWithMenu) {
-      addChild(new FlxGame(800, 480, PlayState, 1, 60, 60, true));
-    } else {
       addChild(new FlxGame(800, 480, MainMenuState, 1, 60, 60, true));
+    } else {
+      addChild(new FlxGame(800, 480, PlayState, 1, 60, 60, true));
     }
   }
 }

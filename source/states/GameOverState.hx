@@ -1,5 +1,6 @@
 package states;
 
+import flixel.system.FlxSound;
 import flixel.FlxState;
 import flixel.FlxG;
 import flixel.text.FlxText;
@@ -9,15 +10,22 @@ class GameOverState extends FlxState {
 
   private var gameOverText: FlxText;
   private var continueText: FlxText;
+  private var gameoverSound: FlxSound;
+  private var soundPlayed: Bool = false;
 
   override public function create(): Void {
     super.create();
     createTitle();
     createInstructions();
+    gameoverSound = FlxG.sound.load('assets/die.wav');
   }
 
   override public function update(elapsed: Float): Void {
     super.update(elapsed);
+    if (!soundPlayed) {
+      soundPlayed = true;
+      gameoverSound.play();
+    }
     Util.checkQuitKey();
     if (FlxG.keys.justPressed.SPACE) {
       FlxG.switchState(new MainMenuState());

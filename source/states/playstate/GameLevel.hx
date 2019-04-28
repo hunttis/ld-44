@@ -20,7 +20,6 @@ class GameLevel extends FlxGroup {
 
   private var player: Player;
   private var enemies: FlxTypedGroup<Enemy>;
-  private var tileCursor: TileCursor;
 
   private var playerLifeBar: FlxBar;
 
@@ -30,7 +29,6 @@ class GameLevel extends FlxGroup {
   public function new(levelNumber): Void {
     super();
     loadLevel(levelNumber);
-    createTileCursor();
   }
   
   override public function update(elapsed: Float): Void {
@@ -137,14 +135,6 @@ class GameLevel extends FlxGroup {
     add(uiLayer);
   }
 
-  private function createTileCursor(): Void {
-    #if (!mobile)
-      // Mouse not on mobile!
-      tileCursor = new TileCursor();
-      uiLayer.add(tileCursor);
-    #end
-  }
-
   public function isGameOver(): Bool {
     #if debug // This part (cheat) of the code is only active if the -debug parameter is present
       if (FlxG.keys.justPressed.ZERO) {
@@ -162,7 +152,7 @@ class GameLevel extends FlxGroup {
       }
     #end
     // Write your level completion terms here
-    return false;
+    return enemies.countLiving() == 0;
   }
 
 }

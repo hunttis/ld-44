@@ -1,5 +1,6 @@
 package states.playstate;
 
+import flixel.system.FlxSound;
 import flixel.tile.FlxTilemap;
 import flixel.math.FlxPoint;
 import flixel.group.FlxGroup.FlxTypedGroup;
@@ -20,17 +21,18 @@ class Player extends FlxSprite {
   var enemies: FlxTypedGroup<Enemy>;
   var shadowPowerAvailable: Bool = true;
   var shadowPowerActive: Bool = false;
-
   var playerState: PlayerState;
-
   var defaultGravity: Float = 600;
   var shadowGravity: Float = 100;
-  var defaultMaxVelocity: FlxPoint = new FlxPoint(200, 400);
+  var defaultMaxVelocity: FlxPoint = new FlxPoint(200, 350);
   var shadowMaxVelocity: FlxPoint = new FlxPoint(0, 50);
-  var maxHealth: Float = 1000;
+  var maxHealth: Float = 100;
 
   var lightLayer: FlxTilemap;
   var isStandingInLight: Bool;
+  var jumpSound: FlxSound;
+  var smokeSound: FlxSound;
+  var biteSound: FlxSound;
 
   public function new(xLoc: Float, yLoc: Float, enemies: FlxTypedGroup<Enemy> ,lightLayer: FlxTilemap, parent: GameLevel) {
     super(xLoc, yLoc);
@@ -49,6 +51,9 @@ class Player extends FlxSprite {
     this.enemies = enemies;
     this.lightLayer = lightLayer;
     this.parent = parent;
+    jumpSound = FlxG.sound.load('assets/jump.wav');
+    smokeSound = FlxG.sound.load('assets/smoke.wav');
+    biteSound = FlxG.sound.load('assets/bite.wav');
   }
 
   override public function update(elapsed: Float): Void {
@@ -56,6 +61,10 @@ class Player extends FlxSprite {
       isStandingInLight = lightLayer.overlaps(this);
     }
     
+    if (isStandingInLight) {
+      parent.particles.glitter(this.x, this.y);
+    }
+
     if (playerState == Darkness && isStandingInLight) {
       playerState = Lit;
       // makeGraphic(16, 32, FlxColor.CYAN);
@@ -143,6 +152,7 @@ class Player extends FlxSprite {
 
   private function jump() {
     if (isTouching(FlxObject.FLOOR) && !shadowPowerActive) {
+      jumpSound.play();
       velocity.y = -maxVelocity.y;
     }
   }
@@ -167,6 +177,7 @@ class Player extends FlxSprite {
       parent.particles.smokePuff(this.x, this.getGraphicMidpoint().y - 4);
       animation.play('shadow');
       alpha = 0.5;
+      smokeSound.play(true);
     } else if (shadowPowerAvailable && shadowPowerActive) {
       playerState = Darkness;
       shadowPowerActive = false;
@@ -178,10 +189,12 @@ class Player extends FlxSprite {
     }
   }
 
-  private function usePowerOnEnemy(player, enemy) {
-    enemy.destroy();
-    addHealth(10);
-    parent.particles.sprayBlood(player.x, player.y);
+  private function usePowerOnEnemy(player, enemy: Enemy) {
+    if (enemy.devour()) {
+      biteSound.play(true);
+      addHealth(10);
+      parent.particles.sprayBlood(player.x, player.y);
+    }
   }
 
   private function addHealth(amount: Float) {
