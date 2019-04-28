@@ -1,21 +1,18 @@
 # Hunttis' Ludum Dare 44 compo entry
 
-- Yay, stuff!
+The pesky druids are at it again. Rummaging around for something to worship they've woken you up! They'll all pay!
 
+Eat all the druids to advance the levels.
 
-Must have:
+Arrow keys to control, up jumps and while in the air, pressing down will smash down and stun an enemy.
 
-[x] Player graphics and animation
-[x] Enemy graphics
-[x] Player indicator of being in the light
-[x] Enemy indicator of being alert
-[x] Enemy indicator of being Aggressive
-[x] Enemy indicator of "cooling down"
-[ ] More Levels
-[ ] Music
-[ ] Sounds
-[ ] Game instructions
+Using powers costs you health. Eating druids replenishes your health.
 
-Nice to have:
-[ ] Sounds OR Music
-[ ] More powers
+You can restart a level by pressing R. You can skip a level by pressing 9.
+
+Done alone in 48h (compo mode) using:
+- Code is Haxe using HaxeFlixel (VSCode)
+- Graphics with PixelMator (the moon) and Pixaki on the iPad (all the rest)
+- Levels made with Tiled
+- Music is done with a ukulele, a ukulele bass and Garageband on iOS
+- Sounds are made with Chiptone
