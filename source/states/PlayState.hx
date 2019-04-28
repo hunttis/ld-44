@@ -7,7 +7,7 @@ import states.playstate.GameLevel;
 class PlayState extends FlxState {
 
   private var currentLevel: GameLevel;
-  private var currentLevelNumber: Int = 1;
+  private var currentLevelNumber: Int = 2;
 
   override public function create(): Void {
     super.create();

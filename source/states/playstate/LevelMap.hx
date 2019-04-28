@@ -1,5 +1,6 @@
 package states.playstate;
 
+import flixel.util.FlxColor;
 import flixel.addons.editors.tiled.TiledObjectLayer;
 import flixel.addons.editors.tiled.TiledLayer.TiledLayerType;
 import flixel.group.FlxGroup;
@@ -12,6 +13,7 @@ class LevelMap extends FlxGroup {
   private var foregroundLayer: FlxTilemap;
   private var lightLayer: FlxTilemap;
   private var backgroundLayer: FlxTilemap;
+  private var parallaxLayer: FlxTilemap;
   private var patrollimitsLayer: FlxTilemap;
   private var player: Player;
   private var enemies: FlxTypedGroup<Enemy> = new FlxTypedGroup<Enemy>();
@@ -34,7 +36,7 @@ class LevelMap extends FlxGroup {
         // trace("Loading TILE LAYER: " + layer.name);
         if (tileLayer.name == "light") {
           lightLayer = new FlxTilemap();
-          lightLayer.loadMapFromCSV(tileLayer.csvData, "assets/foregroundtiles.png", 16, 16, null, 1, 1, 1);
+          lightLayer.loadMapFromCSV(tileLayer.csvData, "assets/lights.png", 16, 16, null, 193, 193, 193);
           lightLayer.alpha = 0.1;
           lightLayer.useScaleHack = false;
         } else if (tileLayer.name == "foreground") {
@@ -47,10 +49,16 @@ class LevelMap extends FlxGroup {
           backgroundLayer = new FlxTilemap();
           backgroundLayer.loadMapFromCSV(tileLayer.csvData, "assets/backgroundtiles.png", 16, 16, null, 65, 65, 65);
           backgroundLayer.useScaleHack = false;
+        } else if (tileLayer.name == "parallax") {
+          // trace("Creating background!");
+          parallaxLayer = new FlxTilemap();
+          parallaxLayer.loadMapFromCSV(tileLayer.csvData, "assets/backgroundtiles.png", 16, 16, null, 65, 65, 65);
+          parallaxLayer.useScaleHack = false;
+          parallaxLayer.color = FlxColor.BLACK;
         } else if (tileLayer.name == "patrollimits") {
           trace("Creating Patrol limits!");
           patrollimitsLayer = new FlxTilemap();
-          patrollimitsLayer.loadMapFromCSV(tileLayer.csvData, "assets/foregroundtiles.png", 16, 16, null, 1, 1, 1);
+          patrollimitsLayer.loadMapFromCSV(tileLayer.csvData, "assets/entities.png", 16, 16, null, 129, 129, 129);
           patrollimitsLayer.useScaleHack = false;
         } else {
           @SuppressWarning("checkstyle:Trace")
@@ -106,6 +114,10 @@ class LevelMap extends FlxGroup {
 
   public function getPatrolLimitsLayer(): FlxTilemap {
     return patrollimitsLayer;
+  }
+
+  public function getParallaxLayer(): FlxTilemap {
+    return parallaxLayer;
   }
 
 }

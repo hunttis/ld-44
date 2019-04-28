@@ -28,18 +28,22 @@ class Enemy extends FlxSprite {
   var stateCooldown: Float = 0;
   var alertLevel: Float = 0;
 
-  var aggroThreshold: Float = 2;
+  var aggroThreshold: Float = 1;
   var shootCooldown: Float = 0.2;
-  var maxShootCooldown: Float = 0.2;
+  var maxShootCooldown: Float = 0.5;
 
   var player: Player;
   var level: FlxTilemap;
   var parent: GameLevel;
-  var aggroBar: FlxBar;
+  var lostSightOfPlayer: Bool = true;
+  var aggroParticleCooldown: Float = 0;
+  var aggroParticleCooldownMax: Float = 0.5;
 
   public function new(xLoc: Float, yLoc: Float, player: Player, level: FlxTilemap, parent: GameLevel) {
     super(xLoc, yLoc);
-    makeGraphic(16, 32, FlxColor.YELLOW);
+    loadGraphic('assets/guard.png', false, 16, 32);
+    setFacingFlip(FlxObject.LEFT, false, false);
+    setFacingFlip(FlxObject.RIGHT, true, false);
     acceleration.y = 600;
     maxVelocity.set(100, 400);
     drag.x = maxVelocity.x;
@@ -49,12 +53,6 @@ class Enemy extends FlxSprite {
   }
 
   override public function update(elapsed: Float): Void {
-    if (aggroBar == null) {
-      aggroBar = new FlxBar(10, 10, FlxBarFillDirection.LEFT_TO_RIGHT, 16, 8, this, 'alertLevel', 0, 10, true);
-      aggroBar.trackParent(0, -16);
-      parent.uiLayer.add(aggroBar);
-    }
-
     acceleration.x = 0;
 
     if (level == null) {
@@ -66,12 +64,14 @@ class Enemy extends FlxSprite {
     } else if (mindState == Idle) {
       if (state == PatrolLeft) {
         acceleration.x = -maxVelocity.x * 2;
+        facing = FlxObject.LEFT;
         if (isTouching(FlxObject.WALL)) {
           state = TurningRight;
           stateCooldown = 1;
         }
       } else if (state == PatrolRight) {
         acceleration.x = maxVelocity.x * 2;
+        facing = FlxObject.RIGHT;
         if (isTouching(FlxObject.WALL)) {
           state = TurningLeft;
           stateCooldown = 1;
@@ -96,9 +96,8 @@ class Enemy extends FlxSprite {
     switch mindState {
       case Idle: {
         if (canSeePlayer) {
-          trace("Alert!");
           mindState = Alert;
-          makeGraphic(16, 32, FlxColor.ORANGE);
+          parent.particles.alert(this.x, this.y);
           increaseAlertness(elapsed);
         } else {
           reduceAlertness(elapsed);
@@ -108,22 +107,35 @@ class Enemy extends FlxSprite {
         if (canSeePlayer) {
           increaseAlertness(elapsed);
           if (alertLevel > aggroThreshold) {
-            trace("Aggressive!");
             mindState = Aggressive;
-            makeGraphic(16, 32, FlxColor.RED);
+            parent.particles.aggro(this.x, this.y);
             alertLevel = 10;
           }
         } else {
           reduceAlertness(elapsed);
           if (alertLevel <= 0) {
-            trace("Going back to idle");
             mindState = Idle;
-            makeGraphic(16, 32, FlxColor.YELLOW);
           }
         }
       }
       case Aggressive: {
+        aggroParticleCooldown -= elapsed;
+
+        var eyesLevel = new FlxPoint(this.getGraphicMidpoint().x, this.getGraphicMidpoint().y - 8);
+        if (!lostSightOfPlayer && level.ray(eyesLevel, player.getGraphicMidpoint())) {
+          fireAggroParticle();
+          if (player.x < this.x) {
+            facing == FlxObject.LEFT;
+          } else {
+            facing == FlxObject.RIGHT;
+          }
+        } else {
+          fireAlertParticle();
+          lostSightOfPlayer = true;
+        }
+
         if (canSeePlayer) {
+          lostSightOfPlayer = false;
           if (shootCooldown < 0) {
             fire();
             shootCooldown = maxShootCooldown;
@@ -133,15 +145,12 @@ class Enemy extends FlxSprite {
         } else {
           reduceAlertness(elapsed);
           if (alertLevel <= 2) {
-            trace("Going back to Alert");
             mindState = Alert;
-            makeGraphic(16, 32, FlxColor.ORANGE);
+            parent.particles.alert(this.x, this.y);
           }
         }
       }
     }
-
-    // trace("Mindstate: " + mindState + " - Alert: " + Math.round(alertLevel * 100) / 100);
 
     super.update(elapsed);
   }
@@ -163,9 +172,22 @@ class Enemy extends FlxSprite {
     }
   }
 
+  private function fireAggroParticle() {
+    if (aggroParticleCooldown < 0) {
+      parent.particles.aggro(this.x, this.y);
+      aggroParticleCooldown = aggroParticleCooldownMax;
+    }
+  }
+
+  private function fireAlertParticle() {
+    if (aggroParticleCooldown < 0) {
+      parent.particles.alert(this.x, this.y);
+      aggroParticleCooldown = aggroParticleCooldownMax;
+    }
+  }
 
   private function checkIfSeesPlayer() {
-    var playerInFrontOfEnemy = (player.x < this.x && state == PatrolLeft) || (player.x > this.x && state == PatrolRight);
+    var playerInFrontOfEnemy = (player.x < this.x && facing == FlxObject.LEFT) || (player.x > this.x && facing == FlxObject.RIGHT);
     var angleBetween = Math.abs(this.getGraphicMidpoint().angleBetween(player.getGraphicMidpoint()));
     var eyesLevel = new FlxPoint(this.getGraphicMidpoint().x, this.getGraphicMidpoint().y - 8);
     var range = (mindState == Aggressive ? 200 : 100) + (player.standingInLight() ? 300 : 100);
@@ -181,11 +203,6 @@ class Enemy extends FlxSprite {
       return true;
     }
     return false;
-  }
-
-  override public function destroy() {
-    aggroBar.destroy();
-    super.destroy();
   }
 
 }

@@ -1,5 +1,7 @@
 package states.playstate;
 
+import flixel.FlxSprite;
+import flixel.addons.display.FlxTiledSprite;
 import flixel.tile.FlxTilemap;
 import flixel.ui.FlxBar;
 import flixel.FlxG;
@@ -82,8 +84,21 @@ class GameLevel extends FlxGroup {
     levelMap = new LevelMap(levelNumber, this);
     add(levelMap);
 
+    var backgroundImage = new FlxTiledSprite('assets/sky.png', 1280 , 480, true, false);
+    backgroundLayer.add(backgroundImage);
+
+    var moon = new FlxSprite('assets/moon.png');
+    backgroundLayer.add(moon);
+    moon.x = 600;
+    moon.y = 100;
+    moon.scale.set(2, 2);
+    moon.scrollFactor.set(0.3, 0.3);
+
+    var parallaxLayer = levelMap.getParallaxLayer();
+    backgroundLayer.add(parallaxLayer);
+    parallaxLayer.scrollFactor.set(0.5, 0.5);
+
     var backgroundMapLayer = levelMap.getBackgroundLayer();
-    backgroundMapLayer.scrollFactor.set(0.5, 0);
     backgroundLayer.add(backgroundMapLayer);
     
     foregroundLayer.add(levelMap.getForegroundLayer());

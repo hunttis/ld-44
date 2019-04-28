@@ -34,7 +34,13 @@ class Player extends FlxSprite {
 
   public function new(xLoc: Float, yLoc: Float, enemies: FlxTypedGroup<Enemy> ,lightLayer: FlxTilemap, parent: GameLevel) {
     super(xLoc, yLoc);
-    makeGraphic(16, 32, FlxColor.BLUE);
+    loadGraphic('assets/player.png', true, 16, 32);
+    animation.add('idle', [0, 0, 0, 3], 2, true);
+    animation.add('walk', [0, 0, 1, 1, 0, 2], 5, true);
+    animation.add('shadow', [3, 4], 5, false);
+    animation.play('shadow');
+    setFacingFlip(FlxObject.LEFT, true, false);
+    setFacingFlip(FlxObject.RIGHT, false, false);
     acceleration.y = defaultGravity;
     maxVelocity.set(defaultMaxVelocity.x, defaultMaxVelocity.y);
     drag.x = maxVelocity.x;
@@ -52,10 +58,16 @@ class Player extends FlxSprite {
     
     if (playerState == Darkness && isStandingInLight) {
       playerState = Lit;
-      makeGraphic(16, 32, FlxColor.CYAN);
+      // makeGraphic(16, 32, FlxColor.CYAN);
     } else if (playerState == Lit && !isStandingInLight) {
       playerState = Darkness;
-      makeGraphic(16, 32, FlxColor.BLUE);
+      // makeGraphic(16, 32, FlxColor.BLUE);
+    }
+
+    if (Math.abs(velocity.x) > 0 && !shadowPowerActive) {
+      animation.play('walk');
+    } else if (velocity.x == 0 && !shadowPowerActive) {
+      animation.play('idle');
     }
 
     acceleration.x = 0;
@@ -126,6 +138,7 @@ class Player extends FlxSprite {
   private function moveRight() {
     acceleration.x = maxVelocity.x * 2;
     facing = FlxObject.RIGHT;
+    
   }
 
   private function jump() {
@@ -144,7 +157,6 @@ class Player extends FlxSprite {
     if (shadowPowerAvailable && !shadowPowerActive) {
       shadowPowerActive = true;
       
-      makeGraphic(16, 32, FlxColor.fromRGB(80, 80, 80, 100));
       playerState = Smoke;
       velocity.x = 0;
       if (velocity.y < 0) {
@@ -153,13 +165,16 @@ class Player extends FlxSprite {
       acceleration.y = shadowGravity;
       maxVelocity.set(shadowMaxVelocity.x, shadowMaxVelocity.y);
       parent.particles.smokePuff(this.x, this.getGraphicMidpoint().y - 4);
+      animation.play('shadow');
+      alpha = 0.5;
     } else if (shadowPowerAvailable && shadowPowerActive) {
       playerState = Darkness;
       shadowPowerActive = false;
-      makeGraphic(16, 32, FlxColor.BLUE);
+      animation.play('idle');
       FlxG.overlap(this, this.enemies, usePowerOnEnemy);
       acceleration.y = defaultGravity;
       maxVelocity.set(defaultMaxVelocity.x, defaultMaxVelocity.y);
+      alpha = 1;
     }
   }
 
