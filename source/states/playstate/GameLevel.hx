@@ -19,7 +19,7 @@ class GameLevel extends FlxGroup {
   public var uiLayer: FlxGroup;
 
   private var player: Player;
-  private var enemies: FlxTypedGroup<Enemy>;
+  public var enemies: FlxTypedGroup<Enemy>;
 
   private var playerLifeBar: FlxBar;
 

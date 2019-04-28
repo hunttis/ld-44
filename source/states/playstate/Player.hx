@@ -6,7 +6,6 @@ import flixel.math.FlxPoint;
 import flixel.group.FlxGroup.FlxTypedGroup;
 import flixel.FlxSprite;
 import flixel.FlxObject;
-import flixel.util.FlxColor;
 import flixel.FlxG;
 
 enum PlayerState {
@@ -21,18 +20,21 @@ class Player extends FlxSprite {
   var enemies: FlxTypedGroup<Enemy>;
   var shadowPowerAvailable: Bool = true;
   var shadowPowerActive: Bool = false;
+  var stunPowerAvailable: Bool = true;
+  var stunPowerActive: Float = 0;
   var playerState: PlayerState;
   var defaultGravity: Float = 600;
   var shadowGravity: Float = 100;
   var defaultMaxVelocity: FlxPoint = new FlxPoint(200, 350);
   var shadowMaxVelocity: FlxPoint = new FlxPoint(0, 50);
   var maxHealth: Float = 100;
-
+  
   var lightLayer: FlxTilemap;
   var isStandingInLight: Bool;
   var jumpSound: FlxSound;
   var smokeSound: FlxSound;
   var biteSound: FlxSound;
+  var thumpSound: FlxSound;
 
   public function new(xLoc: Float, yLoc: Float, enemies: FlxTypedGroup<Enemy> ,lightLayer: FlxTilemap, parent: GameLevel) {
     super(xLoc, yLoc);
@@ -54,6 +56,7 @@ class Player extends FlxSprite {
     jumpSound = FlxG.sound.load('assets/jump.wav');
     smokeSound = FlxG.sound.load('assets/smoke.wav');
     biteSound = FlxG.sound.load('assets/bite.wav');
+    thumpSound = FlxG.sound.load('assets/thump.wav');
   }
 
   override public function update(elapsed: Float): Void {
@@ -65,12 +68,20 @@ class Player extends FlxSprite {
       parent.particles.glitter(this.x, this.y);
     }
 
+    if (isTouching(FlxObject.FLOOR) && stunPowerActive > 0) {
+      parent.particles.smokeBlast(this.x, this.y + 24);
+      stunPowerActive = 0;
+      thumpSound.play();
+    } else if (stunPowerActive > 0) {
+      checkStun();
+      stunPowerActive -= elapsed;
+      parent.particles.spark(this.x +4, this.y);
+    }
+
     if (playerState == Darkness && isStandingInLight) {
       playerState = Lit;
-      // makeGraphic(16, 32, FlxColor.CYAN);
     } else if (playerState == Lit && !isStandingInLight) {
       playerState = Darkness;
-      // makeGraphic(16, 32, FlxColor.BLUE);
     }
 
     if (Math.abs(velocity.x) > 0 && !shadowPowerActive) {
@@ -83,24 +94,24 @@ class Player extends FlxSprite {
     checkKeys();
     checkGamepads();
 
+    if (acceleration.x == 0) {
+      velocity.x = velocity.x * 0.9;
+    }
+
     if (shadowPowerActive) {
       health -= elapsed;
     }
 
-    // You probably want to do most of the logic before super.update(). This is because after the update, 
-    // colliding objects are separated and will no longer be touching.
     super.update(elapsed);
   }
 
   private function checkKeys(): Void {
-    // FlxG.keys.pressed is true while the key is down
     if (FlxG.keys.pressed.UP) {
       jump();
     }
     
-    // FlxG.keys.justPressed is true only once per press
     if (FlxG.keys.justPressed.DOWN) {
-      velocity.y = maxVelocity.y;
+      dive();
     }
 
     if (FlxG.keys.pressed.LEFT ) {
@@ -137,6 +148,7 @@ class Player extends FlxSprite {
     if (gamepad.justPressed.B) {
       checkPower();
     }
+
   }
 
   private function moveLeft() {
@@ -160,6 +172,7 @@ class Player extends FlxSprite {
   private function dive() {
     if (!isTouching(FlxObject.FLOOR)) {
       velocity.y = maxVelocity.y;
+      stunPowerActive = 1;
     }
   }
 
@@ -178,6 +191,7 @@ class Player extends FlxSprite {
       animation.play('shadow');
       alpha = 0.5;
       smokeSound.play(true);
+      FlxG.overlap(this, this.enemies, usePowerOnEnemy);
     } else if (shadowPowerAvailable && shadowPowerActive) {
       playerState = Darkness;
       shadowPowerActive = false;
@@ -189,11 +203,25 @@ class Player extends FlxSprite {
     }
   }
 
+  private function checkStun() {
+    if (stunPowerActive > 0) {
+      FlxG.overlap(this, this.enemies, stunEnemy);
+    }
+  }
+
   private function usePowerOnEnemy(player, enemy: Enemy) {
-    if (enemy.devour()) {
+    if (shadowPowerActive || (!shadowPowerActive && enemy.isStunned())) {
+      if (enemy.devour()) {
+        biteSound.play(true);
+        addHealth(10);
+        parent.particles.sprayBlood(enemy.x, enemy.y);
+      }
+    }
+  }
+
+  private function stunEnemy(player, enemy: Enemy) {
+    if (enemy.stun()) {
       biteSound.play(true);
-      addHealth(10);
-      parent.particles.sprayBlood(player.x, player.y);
     }
   }
 

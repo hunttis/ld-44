@@ -53,12 +53,9 @@ class Particles extends FlxGroup {
   private function createSmokeEmitter() {
     var emitter = new FlxEmitter(0, 0, 100);
     emitter.loadParticles('assets/smoke.png', 100);
-    emitter.setSize(16, 32);
-    emitter.scale.set(0.25, 0.25, 0.5, 0.5, 1, 1, 1.5, 1.5);
     emitter.lifespan.set(0.25, 0.5);
     emitter.alpha.set(0.75, 1, 0, 0);
     emitter.launchMode = FlxEmitterMode.SQUARE;
-    emitter.velocity.set(-10, -10, 10, 0, -10, -10, 10, 0);
     emitter.allowCollisions = FlxObject.FLOOR | FlxObject.WALL;
     return emitter;
   }
@@ -130,7 +127,18 @@ class Particles extends FlxGroup {
   }
 
   public function smokePuff(xLoc: Float, yLoc: Float) {
+    smokeEmitter.setSize(16, 32);
+    smokeEmitter.velocity.set(-10, -10, 10, 0, -10, -10, 10, 0);
     smokeEmitter.setPosition(xLoc, yLoc - 16);
+    smokeEmitter.scale.set(0.25, 0.25, 0.5, 0.5, 1, 1, 1.5, 1.5);
+    smokeEmitter.start(true, 0.1 , 30);
+  }
+
+  public function smokeBlast(xLoc: Float, yLoc: Float) {
+    smokeEmitter.setSize(16, 8);
+    smokeEmitter.velocity.set(-100, -10, 100, 0, -10, -20, 10, 0);
+    smokeEmitter.setPosition(xLoc, yLoc);
+    smokeEmitter.scale.set(0.25, 0.25, 0.5, 0.5, 0.5, 0.5, 0.75, 0.75);
     smokeEmitter.start(true, 0.1 , 30);
   }
 

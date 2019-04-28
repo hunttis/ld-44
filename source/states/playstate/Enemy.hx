@@ -26,6 +26,7 @@ enum MindState {
   Alert;
   Aggressive;
   BeingDevoured;
+  Stunned;
 }
 
 class Enemy extends FlxSprite {
@@ -90,6 +91,9 @@ class Enemy extends FlxSprite {
       }
       case BeingDevoured: {
         beingDevouredLoop(elapsed);
+      }
+      case Stunned: {
+        stunnedLoop(elapsed);
       }
     }
 
@@ -235,6 +239,19 @@ class Enemy extends FlxSprite {
     }
   }
 
+  private function stunnedLoop(elapsed: Float) {
+    stateCooldown -= elapsed;
+    velocity.x = 0;
+    scale.x = Math.max(0.8, 1 - Math.random());
+    scale.y = Math.max(0.8, 1 - Math.random());
+    if (stateCooldown <= 0) {
+      increaseAlertness(4);
+      mindState = Alert;
+      scale.x = 1;
+      scale.y = 1;
+    }
+  }
+
   private function flipFacing() {
     if (facing == FlxObject.LEFT) {
       facing = FlxObject.RIGHT;
@@ -271,15 +288,16 @@ class Enemy extends FlxSprite {
     }
   }
 
-  private function checkIfSeesPlayer(ignoreFacing: Bool = false) {
+  private function checkIfSeesPlayer(ignoreFacing: Bool = false, ignoreShadowForm: Bool = false) {
     var playerInFrontOfEnemy = ignoreFacing || (player.x < this.x && facing == FlxObject.LEFT) || (player.x > this.x && facing == FlxObject.RIGHT);
     var angleBetween = Math.abs(this.getGraphicMidpoint().angleBetween(player.getGraphicMidpoint()));
     var atVisionLevel = ignoreFacing || (angleBetween > 70 && angleBetween < 100);
     var eyesLevel = new FlxPoint(this.getGraphicMidpoint().x, this.getGraphicMidpoint().y - 4);
     var range = (mindState == Aggressive ? 200 : 100) + (player.standingInLight() ? 300 : 100);
     var inRange = eyesLevel.distanceTo(player.getGraphicMidpoint()) <= range;
+    var isVisible = player.isCorporeal() || ignoreShadowForm;
 
-    if (player.isCorporeal() &&
+    if (isVisible &&
       inRange &&
       playerInFrontOfEnemy &&
       atVisionLevel &&
@@ -295,9 +313,31 @@ class Enemy extends FlxSprite {
       beingDevoured = true;
       mindState = BeingDevoured;
       stateCooldown = 1;
+      parent.enemies.forEachAlive((enemy: Enemy) -> {
+        enemy.checkIfSeesDevouring();
+      });
       return true;
     }
     return false;
+  }
+
+  public function checkIfSeesDevouring(): Void {
+    if (checkIfSeesPlayer(false, true)) {
+      increaseAlertness(4);
+    }
+  }
+
+  public function stun(): Bool {
+    if (mindState != Stunned) {
+      mindState = Stunned;
+      stateCooldown = 2;
+      return true;
+    }
+    return false;
+  }
+
+  public function isStunned() {
+    return mindState == Stunned && stateCooldown > 0;
   }
 
 }
